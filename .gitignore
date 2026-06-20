@@ -1,0 +1,95 @@
+# =============================================================================
+# Rust / Cargo
+# =============================================================================
+target/
+**/*.rs.bk
+**/*.pdb
+
+# =============================================================================
+# Build artifacts (Rust + JS/TS)
+# =============================================================================
+dist/
+build/
+*.o
+*.so
+*.dylib
+*.dll
+
+# =============================================================================
+# Runtime data / palace storage (never commit)
+# =============================================================================
+index/
+*.db
+*.db-wal
+*.db-shm
+palace.db*
+.mkd-mneme/
+tmp/
+scratch/
+
+# =============================================================================
+# Node.js / TypeScript (HTTP transport, tests, MCP SDK usage)
+# =============================================================================
+node_modules/
+# package-lock.json is usually committed for reproducibility
+
+# =============================================================================
+# IDE / Editor
+# =============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-*
+
+# =============================================================================
+# OS generated files
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =============================================================================
+# Environment / secrets
+# =============================================================================
+.env
+.envrc
+.env.local
+.env.*.local
+
+# =============================================================================
+# Logs & misc
+# =============================================================================
+*.log
+*.tmp
+
+# Backup files created by `mkd-mcp doctor --fix` (safety snapshots next to
+# orchestrator.yml or any file passed via --config). These can contain the full
+# previous (possibly sensitive) content of the config, including secret
+# references. Never commit them.
+*.bak
+
+# =============================================================================
+# Personal / agent scratch (not part of the public project)
+# =============================================================================
+.agents/
+.gemini/
+.specify/
+.antigravitycli/
+GEMINI.md
+mkd-mcp.yaml
+mkd-mcp.code-workspace
+*.code-workspace
+.worktrees
+
+.temp/
+
+# mkd-orchestrator agent artifacts (auto-managed)
+kilo.json
+.kilo/
+.antigravitycli/
