@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-06-29
+
+### Changed
+- **Breaking:** default stdout is now a compact single-line JSON envelope (mkd-cli machine-first contract, mkd#81 / mkd#47).
+- Errors use the same envelope shape with `result: ERROR` (or human text on stderr when `--human`).
+
+### Added
+- Global `--format compact|json|human` (default: `compact`).
+- `--human` and `--pretty` shorthands.
+- `--plain` for legacy bare port output (shell `PORT=$(mkd-freeport --plain)`).
+- Integration tests for the output contract (`tests/cli_output_contract.rs`).
+- `src/output.rs` shared envelope formatting.
+
 ## [0.1.1] - 2026-06-20
 
 ### Added

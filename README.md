@@ -2,7 +2,7 @@
 
 Find available free TCP ports for scripts and AI agents.
 
-**Version 0.1.0**
+**Version 0.2.0**
 
 Simple CLI utility that returns an available TCP port on the system. Useful for:
 - Scripts that need to start services on random ports
@@ -12,11 +12,21 @@ Simple CLI utility that returns an available TCP port on the system. Useful for:
 ## Usage
 
 ```bash
-# Get a random free ephemeral port (49152-65535)
+# Default: compact single-line JSON envelope (machine-first / agent-friendly)
 mkd-freeport
 
 # Get the first available port above 1024
 mkd-freeport --first
+
+# Human-readable text
+mkd-freeport --human
+
+# Pretty-printed JSON envelope
+mkd-freeport --pretty
+# or: mkd-freeport --format json
+
+# Legacy bare port number (pre-0.2.0 shell capture)
+mkd-freeport --plain
 
 # Show help
 mkd-freeport --help
@@ -33,12 +43,26 @@ cargo install --path .
 
 ## Output
 
-The utility outputs only the port number to stdout, making it easy to capture in scripts:
+**Default (0.2.0+):** a compact JSON envelope aligned with mkd-cli machine-first output:
+
+```json
+{"result":"OK","message":"Free TCP port allocated","data":{"port":49152,"strategy":"random"}}
+```
+
+Parse with `jq`:
 
 ```bash
-PORT=$(mkd-freeport)
+PORT=$(mkd-freeport | jq -r '.data.port')
 echo "Using port $PORT"
 ```
+
+For legacy scripts that expect only the port on stdout, use `--plain`:
+
+```bash
+PORT=$(mkd-freeport --plain)
+```
+
+Refs: mkd#47 (mkd-cli contract), mkd#81 (this tool).
 
 ## See Also
 

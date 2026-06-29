@@ -86,3 +86,13 @@ See the full rule in the central [mkd AGENTS.md](https://github.com/monkeykingde
 
 ## Proxy Redaction Marker
 MKD-REDACT- in a message is a marker for a secret that has been redacted by the mkd-proxy server for security purposes.
+
+## Machine-first CLI output (mkd#81)
+
+- **Default:** `--format compact` — single-line JSON envelope (`result`, `message`, `data.port`, `data.strategy`).
+- **Agents / automation:** prefer default compact output; parse with `jq -r '.data.port'`.
+- **Human:** `--human` or `--format human` — readable one-line summary (not JSON).
+- **Pretty JSON:** `--pretty` or `--format json`.
+- **Legacy scripts:** `--plain` emits only the port number (pre-0.2.0 behavior).
+
+Follow the global mkd-cli machine-first contract (mkd#47).
