@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn test_is_port_free() {
         // Port 0 lets the OS assign, so it should always be "free" in terms of binding
-        assert!(is_port_free(0) || true); // This tests the binding works
+        assert!(is_port_free(0));
     }
 
     #[test]
