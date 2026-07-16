@@ -1,22 +1,60 @@
-mod output;
+// SPDX-FileCopyrightText: 2026 Nathan A Chadwick
+//
+// SPDX-License-Identifier: LicenseRef-FFM-1.0
 
-use clap::Parser;
+//! mkd-freeport — find free TCP ports and operate the FS7 docker reaper
+//! (`mkd-docker-reap-smoke`).
+//!
+//! Default mode (no subcommand): allocate and return a free random TCP port
+//! for agents and scripts (see mkd#81).
+//!
+//! `reap-smoke` subcommand: thin Rust wrapper around the bash reaper
+//! `mkd-docker-reap-smoke.sh` shipped in `mkd` (deploy/docker/scripts/).
+//! Default action is dry-run; pass `--yes` to actually reap. The bash
+//! script remains the canonical engine for docker-inspect / docker-rm /
+//! docker-compose interactions and remains the auditable source of
+//! behaviour — see `qa-gate-hygiene-contract-spec.md` §3 Non-goals.
+
+mod output;
+mod reap_smoke;
+
+use clap::{Parser, Subcommand};
 use output::{print_error, print_plain_port, print_success, OutputFormat, PortStrategy};
 use std::net::TcpListener;
+use std::process::ExitCode;
 
-/// Find available free TCP ports for scripts and AI agents.
-///
-/// Default output is a compact single-line JSON envelope for agents and automation.
-/// Use `--human` or `--format human` for readable text, or `--plain` for legacy bare port output.
+/// Free-port finder + FS7 docker reaper operator surface.
 #[derive(Parser, Debug)]
 #[command(name = "mkd-freeport")]
 #[command(
     version,
-    about = "Find free TCP ports — default output is compact JSON for agents; use --format human or --human for readable text",
-    long_about = None
+    about = "Find free TCP ports and run the FS7 docker reaper — default subcommand is `find`",
+    long_about = None,
+    arg_required_else_help = false
 )]
-struct Args {
-    /// Return the first available port above 1024 instead of a random port
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Command>,
+}
+
+#[derive(Subcommand, Debug)]
+enum Command {
+    /// Find and return a free TCP port (default when no subcommand given).
+    Find(FindArgs),
+
+    /// Reap stale QA-gate and cutover dry-run Compose projects (FS7).
+    ///
+    /// Thin wrapper around `mkd-docker-reap-smoke.sh`. All safety properties
+    /// (deny list, `--keep-volumes` default, age thresholds, dry-run by default)
+    /// are owned by the bash script; this binary is the operator entry point
+    /// that's always available, has no runtime deps, and survives even when
+    /// `mkd-cli` is not installed.
+    ReapSmoke(reap_smoke::ReapSmokeArgs),
+}
+
+#[derive(Parser, Debug)]
+struct FindArgs {
+    /// Return the first available port above 1024 instead of a random port.
     #[arg(long)]
     first: bool,
 
@@ -37,7 +75,7 @@ struct Args {
     plain: bool,
 }
 
-impl Args {
+impl FindArgs {
     fn output_format(&self) -> OutputFormat {
         if self.human {
             OutputFormat::Human
@@ -49,8 +87,34 @@ impl Args {
     }
 }
 
-fn main() {
-    let args = Args::parse();
+fn main() -> ExitCode {
+    let cli = Cli::parse();
+
+    match cli.command {
+        // Backward-compatible: `mkd-freeport` (no subcommand) defaults to `find`.
+        None => {
+            // Built once with clap's Default for FindArgs.
+            let find_args = FindArgs {
+                first: false,
+                format: OutputFormat::Compact,
+                human: false,
+                pretty: false,
+                plain: false,
+            };
+            run_find(find_args)
+        }
+        Some(Command::Find(args)) => run_find(args),
+        Some(Command::ReapSmoke(args)) => match reap_smoke::run(&args) {
+            Ok(code) => ExitCode::from(code),
+            Err(msg) => {
+                eprintln!("reap-smoke error: {msg}");
+                ExitCode::from(2)
+            }
+        },
+    }
+}
+
+fn run_find(args: FindArgs) -> ExitCode {
     let format = args.output_format();
     let strategy = if args.first {
         PortStrategy::First
@@ -63,18 +127,19 @@ fn main() {
             if args.plain {
                 if let Err(e) = print_plain_port(port) {
                     eprintln!("Error: failed to write output: {e}");
-                    std::process::exit(1);
+                    return ExitCode::from(1);
                 }
             } else if let Err(e) = print_success(port, strategy, format) {
                 eprintln!("Error: failed to write output: {e}");
-                std::process::exit(1);
+                return ExitCode::from(1);
             }
+            ExitCode::SUCCESS
         }
         Err(code) => {
             if let Err(e) = print_error("No free ports available", code, format) {
                 eprintln!("Error: failed to write output: {e}");
             }
-            std::process::exit(1);
+            ExitCode::from(1)
         }
     }
 }
