@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Nathan A Chadwick
+#
+# SPDX-License-Identifier: LicenseRef-FFM-1.0
+
+[toolchain]
+channel = "1.97.1"
+components = ["rustfmt", "clippy"]
+profile = "minimal"
