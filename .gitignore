@@ -16,13 +16,13 @@ build/
 *.dll
 
 # =============================================================================
-# Runtime data / palace storage (never commit)
+# Runtime data / mkd storage (never commit)
 # =============================================================================
 index/
 *.db
 *.db-wal
 *.db-shm
-palace.db*
+mkd.db*
 .mkd-mneme/
 tmp/
 scratch/

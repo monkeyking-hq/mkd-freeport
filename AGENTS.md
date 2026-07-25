@@ -8,7 +8,7 @@ SPDX-License-Identifier: LicenseRef-FFM-1.0
 
 CLI utility to find and return an available free TCP port. Used by agents and scripts to allocate runtime ports for services (avoids hardcoded port conflicts).
 
-**Tracked in the palace** (wing=mkd-freeport).
+**Tracked in the mkd** (wing=mkd-freeport).
 
 **Documentation**: All project documentation MUST be written and stored under `../mkd/platform/docs/`. DO NOT create new documentation in this repository.
 
@@ -73,7 +73,7 @@ git push origin main && git push mkd-origin main 2>/dev/null || git push origin 
 git branch -d harmonize-agents-md
 ```
 
-## Palace
+## Mkd
 - Wing: mkd-freeport
 - Default branch: main
 
