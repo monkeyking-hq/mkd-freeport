@@ -20,19 +20,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install stable toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install toolchain (matches rust-toolchain.toml)
+        uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: 1.98.1
           components: rustfmt, clippy
 
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
       - name: cargo clippy
-        run: cargo clippy --workspace --all-features --all-targets -- -D warnings
+        run: cargo clippy --release --workspace --all-features --all-targets -- -D warnings
 
       - name: cargo check
-        run: cargo check --workspace --all-targets
+        run: cargo check --release --workspace --all-targets
 
       - name: cargo test
-        run: cargo test --workspace -- --quiet
+        run: cargo test --release --workspace -- --quiet
