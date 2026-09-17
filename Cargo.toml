@@ -4,7 +4,7 @@ version = "0.2.1"
 edition = "2021"
 description = "Find available free TCP ports for scripts and AI agents"
 license = "MIT"
-repository = "https://github.com/monkeyking.dev/mkd-freeport"
+repository = "http://stonemonkey:37373/MonkeyKing.dev/mkd-freeport"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
