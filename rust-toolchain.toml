@@ -3,6 +3,6 @@
 # SPDX-License-Identifier: LicenseRef-FFM-1.0
 
 [toolchain]
-channel = "1.97.1"
+channel = "1.98.1"
 components = ["rustfmt", "clippy"]
 profile = "minimal"
