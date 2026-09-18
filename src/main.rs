@@ -110,9 +110,9 @@ fn find_random_free_port() -> u16 {
 }
 
 fn rand_port() -> u16 {
-    use rand::Rng;
-    let mut rng = rand::thread_rng();
-    rng.gen_range(49152..=65535)
+    use rand::RngExt;
+    let mut rng = rand::rng();
+    rng.random_range(49152..=65535)
 }
 
 fn is_port_free(port: u16) -> bool {
