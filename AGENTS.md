@@ -48,33 +48,17 @@ Preserve life and prevent harm. Do not harm human beings or humanity; do not all
 - **Law 10 (Stewardship)** — keep the tool small, correct, and dependency-minimal; the port it returns must be usable immediately by the caller.
 - **Law 9 (Restraint)** — document races: allocation is best-effort; callers must still attempt bind atomically.
 
+## Before continuing
+
+Read [`../mkd/AGENTS.md`](../mkd/AGENTS.md) **before** other work in this repo (company laws, agent rules, Change Protocol).
+
 ## Change Protocol
 
-When making changes that touch multiple repositories, follow this protocol:
+**Canonical:** [`../mkd/platform/standards/agent/change-protocol.md`](../mkd/platform/standards/agent/change-protocol.md). Do not merge to `main` locally.
 
-1. **Checkout main and pull** — ensure you are on `main` and up to date in each repository
-2. **Stash any unrelated changes** (`git stash`) — if there are uncommitted changes unrelated to your work, stash them before creating your feature branch to avoid destroying someone else's work
-3. **Create a feature branch** in each affected repository (use the same branch name across repos, e.g. `harmonize-agents-md`)
-4. **Make your changes** in all affected repositories
-5. **Bump the build/version number** in each repository's `Cargo.toml`
-6. **Add a changelog entry** describing the changes
-7. **Commit** all changes to the feature branch
-8. **Merge** the feature branch to `main` (fast-forward or with merge commit)
-9. **Pop stashed changes** (`git stash pop`) — restore any unrelated changes after merging
-10. **Push to remotes** — push to `origin` and `mkd-origin` if both are configured
-
-Example workflow:
-```bash
-git checkout main && git pull
-git stash push -m "WIP: unrelated changes"  # if any exist
-git checkout -b harmonize-agents-md
-# make changes to multiple repos
-git add -A && git commit -m "feat: add no_git_artifacts flag"
-git checkout main && git merge harmonize-agents-md
-git stash pop  # restore unrelated changes
-git push origin main && git push mkd-origin main 2>/dev/null || git push origin main
-git branch -d harmonize-agents-md
-```
+- Same feature-branch name across sibling repos; open a Gitea PR with `tea pulls create`; **leave the PR open** unless Nate explicitly asks to merge.
+- **Code-producing work:** SemVer bump in this repo's version file (`Cargo.toml` / `[workspace.package]`, or `package.json` for JS/TS) **and** a `CHANGELOG.md` entry.
+- **Docs-only:** date-stamp `CHANGELOG.md`; no version bump.
 
 ## Mkd
 - Wing: mkd-freeport
