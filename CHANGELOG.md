@@ -1,3 +1,8 @@
+## Unreleased
+
+### Changed
+- Sibling `AGENTS.md` Change Protocol: read `../mkd/AGENTS.md` first; canonical `platform/standards/agent/change-protocol.md` (SemVer bump for code, `tea` PR, leave open unless Nate asks to merge). No local merge-to-main copy.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
