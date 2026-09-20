@@ -56,7 +56,8 @@ Read [`../mkd/AGENTS.md`](../mkd/AGENTS.md) **before** other work in this repo (
 
 **Canonical:** [`../mkd/platform/standards/agent/change-protocol.md`](../mkd/platform/standards/agent/change-protocol.md). Do not merge to `main` locally.
 
-- Same feature-branch name across sibling repos; open a Gitea PR with `tea pulls create`; **leave the PR open** unless Nate explicitly asks to merge.
+- Same feature-branch name across sibling repos; open a Gitea PR with `tea pulls create`; **monitor CI, fix failures, and auto-merge on the forge when green**; then auto-advance to the next pending task. Operator “leave this one open” overrides per-PR.
+- New coding tasks are delegated to **The Smith** (`../mkd-agent/agents/thesmith.md`) as a subagent; post a **compact summary** (≤6 lines) after every finished task.
 - **Code-producing work:** SemVer bump in this repo's version file (`Cargo.toml` / `[workspace.package]`, or `package.json` for JS/TS) **and** a `CHANGELOG.md` entry.
 - **Docs-only:** date-stamp `CHANGELOG.md`; no version bump.
 

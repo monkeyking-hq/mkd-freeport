@@ -1,5 +1,8 @@
 ## Unreleased
 
+### Changed (2026-09-20 change protocol)
+- Change Protocol alignment (2026-09-20): monitor PR CI, fix failures, **auto-merge on the forge when green**, auto-advance to the next task; coding tasks delegated to The Smith (`mkd-agent/agents/thesmith.md`); compact summary after each finished task. Canonical: `mkd/platform/standards/agent/change-protocol.md`.
+
 ### Changed
 - Sibling `AGENTS.md` Change Protocol: read `../mkd/AGENTS.md` first; canonical `platform/standards/agent/change-protocol.md` (SemVer bump for code, `tea` PR, leave open unless Nate asks to merge). No local merge-to-main copy.
 
