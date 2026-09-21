@@ -48,3 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--first` flag to return the first available port above 1024 (default: random ephemeral port)
 - Random port selection from ephemeral range (49152-65535)
 - Unit tests for core functionality
+
+## Unreleased — 2026-09-20 — spec 785 cutover
+
+- **Changed**: AGENTS.md front matter `wing=mkd-freeport` → `group=mkd.projects.mkd-freeport`; `- Wing:` → `- Group:`. Closes issue #20.

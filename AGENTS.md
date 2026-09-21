@@ -11,7 +11,7 @@ CLI utility to find and return an available free TCP port. Used by agents and sc
 
 **Working forge (Gitea):** `MonkeyKing.dev/mkd-freeport` (`mkd-git:37374` / `stonemonkey:37373`). Use **`tea`**, never **`gh`**. See workspace `AGENTS.md`.
 
-**Tracked in the mkd** (wing=mkd-freeport).
+**Tracked in the mkd** (group=mkd.projects.mkd-freeport).
 
 **Documentation**: All project documentation MUST be written and stored under `../mkd/platform/docs/`. DO NOT create new documentation in this repository.
 
@@ -62,7 +62,7 @@ Read [`../mkd/AGENTS.md`](../mkd/AGENTS.md) **before** other work in this repo (
 - **Docs-only:** date-stamp `CHANGELOG.md`; no version bump.
 
 ## Mkd
-- Wing: mkd-freeport
+- Group: mkd.projects.mkd-freeport
 - Default branch: main
 
 ## Network ports (core purpose)
