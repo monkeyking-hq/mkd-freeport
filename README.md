@@ -1,5 +1,7 @@
 # mkd-freeport
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Find available free TCP ports for scripts and AI agents.
 
 **Version 0.2.0**
@@ -67,3 +69,12 @@ Refs: mkd#47 (mkd-cli contract), mkd#81 (this tool).
 ## See Also
 
 - [CHANGELOG.md](./CHANGELOG.md)
+
+## Universal Code
+
+This project follows the [Universal Code v1.0.0](https://github.com/monkeyking-hq/universal-code).
+
+## License
+
+Released under the [MIT License](LICENSE).
+

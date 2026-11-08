@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Nathan A Chadwick
+#
+# SPDX-License-Identifier: MIT
+
 [package]
 name = "mkd-freeport"
 version = "0.2.1"

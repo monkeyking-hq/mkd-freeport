@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Nathan A Chadwick
 //
-// SPDX-License-Identifier: LicenseRef-FFM-1.0
+// SPDX-License-Identifier: MIT
 
 //! Machine-first CLI output aligned with mkd-cli compact JSON envelope (mkd#47 / mkd#81).
 
