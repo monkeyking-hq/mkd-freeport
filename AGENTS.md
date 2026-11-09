@@ -1,7 +1,7 @@
 <!--
 SPDX-FileCopyrightText: 2026 Nathan A Chadwick
 
-SPDX-License-Identifier: LicenseRef-FFM-1.0
+SPDX-License-Identifier: MIT
 -->
 
 # AI Agent & LLM Guide for mkd-freeport
@@ -16,6 +16,8 @@ CLI utility to find and return an available free TCP port. Used by agents and sc
 **Documentation**: All project documentation MUST be written and stored under `../mkd/platform/docs/`. DO NOT create new documentation in this repository.
 
 ## Laws
+
+This project follows the Universal Code v1.0.0 - read https://github.com/monkeyking-hq/universal-code/blob/main/UC-EMBED-v1.0.0.md
 
 **Canonical source**: `../universal-code/UC-v1.0.0.md` (embed: `../universal-code/UC-EMBED-v1.0.0.md`; https://github.com/monkeyking-hq/universal-code). Each system adds **contextual corollaries** below — do not paste the full canonical doc verbatim.
 
