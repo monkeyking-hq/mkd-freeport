@@ -1,6 +1,7 @@
 ## Unreleased
 
 ### Changed (2026-11-11)
+- Rewrote AGENTS.md with current CLI/library contracts, source map, release-only verification, socket-test guidance, and canonical workspace delivery/documentation policies.
 - Updated README for 0.3.0 CLI options, output metadata, foreground reservations, and public Rust APIs.
 
 ### Changed (2026-09-20 change protocol)
