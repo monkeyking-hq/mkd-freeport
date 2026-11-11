@@ -8,7 +8,6 @@ version = "0.3.1"
 edition = "2021"
 description = "Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts and AI agents"
 license = "MIT"
-repository = "http://stonemonkey:37373/MonkeyKing.dev/mkd-freeport"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }

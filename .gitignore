@@ -16,14 +16,12 @@ build/
 *.dll
 
 # =============================================================================
-# Runtime data / mkd storage (never commit)
+# Runtime data (never commit)
 # =============================================================================
 index/
 *.db
 *.db-wal
 *.db-shm
-mkd.db*
-.mkd-mneme/
 tmp/
 scratch/
 
@@ -68,10 +66,7 @@ Thumbs.db
 *.log
 *.tmp
 
-# Backup files created by `mkd-mcp doctor --fix` (safety snapshots next to
-# orchestrator.yml or any file passed via --config). These can contain the full
-# previous (possibly sensitive) content of the config, including secret
-# references. Never commit them.
+# Configuration backups may contain sensitive data. Never commit them.
 *.bak
 
 # =============================================================================
@@ -82,14 +77,15 @@ Thumbs.db
 .specify/
 .antigravitycli/
 GEMINI.md
-mkd-mcp.yaml
-mkd-mcp.code-workspace
 *.code-workspace
 .worktrees
 
 .temp/
 
-# mkd-orchestrator agent artifacts (auto-managed)
+# Local agent artifacts
 kilo.json
 .kilo/
 .antigravitycli/
+
+# Machine-specific agent instructions
+/AGENTS.local.md

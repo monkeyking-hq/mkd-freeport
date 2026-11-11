@@ -7,15 +7,9 @@ SPDX-License-Identifier: MIT
 
 ## Read first
 
-In the MKD multi-repository workspace, read these before continuing:
+Read `README.md`, `Cargo.toml`, and the source relevant to the task. Follow `AGENTS.local.md` in the repository root if present; it contains local-only instructions and must remain untracked.
 
-1. Workspace `../AGENTS.md` and `../AGENTS.local.md`.
-2. Company/platform instructions: [`../mkd/AGENTS.md`](../mkd/AGENTS.md).
-3. Canonical [Change Protocol](../mkd/platform/standards/agent/change-protocol.md).
-
-Follow the [Universal Code](../universal-code/UC-v1.0.0.md) and company rules through those canonical sources rather than duplicating them here. Read local products from disk first.
-
-These sibling paths describe the MKD workspace layout. In a standalone checkout, do not invent missing policy contents or assume access to the private forge; report material missing context and follow the instructions available in that checkout.
+This project follows the [Universal Code](https://github.com/monkeyking-hq/universal-code/blob/main/UC-v1.0.0.md). Keep shared instructions self-contained; do not require private services, sibling repositories, or machine-specific paths.
 
 ## Purpose and source map
 
@@ -29,7 +23,6 @@ These sibling paths describe the MKD workspace layout. In a standalone checkout,
 | `tests/allocation.rs` | Library allocation, exhaustion, cleanup, protocols, and address families |
 | `tests/reservation_cli.rs` | CLI reservation lifetime, signals, timeouts, and option validation |
 | `tests/cli_output_contract.rs` | CLI output contract |
-| `.gitea/workflows/ci.yml` | Required CI commands |
 | `Cargo.toml`, `rust-toolchain.toml` | Package version/dependencies and pinned compiler/components |
 
 Use the source, README, and rendered `--help` as references. Keep README examples, CLI help, and library documentation aligned when behavior changes.
@@ -55,7 +48,7 @@ Use the source, README, and rendered `--help` as references. Keep README example
 
 ## Build and verification
 
-All Cargo compile, check, lint, test, and run commands **must use `--release`**. See [release-only rule](../mkd/platform/standards/agents/rules/002-cargo-release-only.md). Do not create `target/debug`; remove it immediately if accidentally created. `cargo install --path .` already uses release mode.
+All Cargo compile, check, lint, test, and run commands **must use `--release`**. Do not create `target/debug`; remove it immediately if accidentally created. `cargo install --path .` already uses release mode.
 
 Run checks appropriate to the change. For code changes, match CI:
 
@@ -72,17 +65,15 @@ Socket tests need permission to create and bind local TCP/UDP sockets. Allocate 
 
 If socket tests or forge commands fail because of execution restrictions, request the execution permission supported by the session and retry when approved. Do not change allocation semantics, weaken tests, or claim tests passed to work around a restricted environment.
 
-## Delivery in the MKD workspace
+## Change workflow
 
-- Working forge: **Gitea**, `MonkeyKing.dev/mkd-freeport`; SSH `mkd-git:37374`, HTTP `stonemonkey:37373`. Use **`tea`** (or installed `tea-cli`), **never `gh`**, for this forge. A public GitHub copy does not change the workspace delivery remote.
-- Follow the canonical [Change Protocol](../mkd/platform/standards/agent/change-protocol.md): feature branch, commit, push, Gitea PR against `main`; monitor CI, fix failures, resolve review comments, and auto-merge on the forge when green. Never merge into `main` locally. An operator request to leave a PR open overrides auto-merge for that PR.
-- Delegate new coding tasks to [The Smith](../mkd-agent/agents/thesmith.md) as a subagent. Keep changes scoped; preserve unrelated work.
+Work on a feature branch, keep changes focused, and preserve unrelated edits. Use the checkout’s configured remote and available forge tooling. Verify relevant checks and review feedback before merging.
+
 - Code-producing changes require a SemVer bump in `Cargo.toml`, a matching `Cargo.lock` update, and a versioned `CHANGELOG.md` entry. Docs-only changes require a dated changelog entry without a version bump.
 - After each finished task, post a summary of at most six lines: result/PR, verification, version/changelog, and next task or blocker. Advance to the next unambiguous task in the active backlog when one exists.
-- Do not infer publication from a version number or a request for GitHub metadata. Follow the company lifecycle default until an explicit first-public-release declaration updates it.
 
 ## Documentation and secrets
 
-Maintain repository-facing documentation here: README, CLI help, Rust API docs, changelog, and this guide. Durable MKD specs, plans, architecture decisions, and verification reports belong in their canonical central MKD document homes per the company guide; do not create a local `platform/docs/` tree.
+Maintain repository-facing documentation here: README, CLI help, Rust API docs, changelog, and this guide.
 
-Never print, commit, or place credentials in URLs, PRs, examples, or logs. Follow company handling for redaction incidents. MKD subject/group: `mkd.projects.mkd-freeport`.
+Never print, commit, or place credentials in URLs, PRs, examples, or logs.

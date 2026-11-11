@@ -1,14 +1,9 @@
 ## Unreleased
 
 ### Changed (2026-11-11)
-- Rewrote AGENTS.md with current CLI/library contracts, source map, release-only verification, socket-test guidance, and canonical workspace delivery/documentation policies.
+- Rewrote AGENTS.md with current CLI/library contracts, source map, release-only verification, and socket-test guidance.
+- Removed private infrastructure references from package metadata, documentation, comments, and shared agent instructions; kept local agent rules untracked.
 - Updated README for 0.3.0 CLI options, output metadata, foreground reservations, and public Rust APIs.
-
-### Changed (2026-09-20 change protocol)
-- Change Protocol alignment (2026-09-20): monitor PR CI, fix failures, **auto-merge on the forge when green**, auto-advance to the next task; coding tasks delegated to The Smith (`mkd-agent/agents/thesmith.md`); compact summary after each finished task. Canonical: `mkd/platform/standards/agent/change-protocol.md`.
-
-### Changed
-- Sibling `AGENTS.md` Change Protocol: read `../mkd/AGENTS.md` first; canonical `platform/standards/agent/change-protocol.md` (SemVer bump for code, `tea` PR, leave open unless Nate asks to merge). No local merge-to-main copy.
 
 # Changelog
 
@@ -42,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2026-06-29
 
 ### Changed
-- **Breaking:** default stdout is now a compact single-line JSON envelope (mkd-cli machine-first contract, mkd#81 / mkd#47).
+- **Breaking:** default stdout is now a compact single-line JSON envelope for scripting and automation.
 - Errors use the same envelope shape with `result: ERROR` (or human text on stderr when `--human`).
 
 ### Added
@@ -55,8 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.1] - 2026-06-20
 
 ### Added
-- `AGENTS.md` following the canonical template from `mkd` (LAWS-EMBED summary + enforcement + contextual corollaries for port allocation truthfulness and stewardship).
-- CHANGELOG entry for the documentation + governance addition.
+- `AGENTS.md` with development instructions and port allocation correctness guidance.
+- Changelog entry for the documentation and agent guidance.
 
 ## [0.1.0] - 2026-06-20
 
@@ -67,7 +62,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--first` flag to return the first available port above 1024 (default: random ephemeral port)
 - Random port selection from ephemeral range (49152-65535)
 - Unit tests for core functionality
-
-## Unreleased — 2026-09-20 — spec 785 cutover
-
-- **Changed**: AGENTS.md front matter `wing=mkd-freeport` → `group=mkd.projects.mkd-freeport`; `- Wing:` → `- Group:`. Closes issue #20.

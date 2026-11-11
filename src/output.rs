@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-//! Machine-first CLI output aligned with mkd-cli compact JSON envelope (mkd#47 / mkd#81).
+//! Compact JSON envelopes and human-readable CLI output.
 
 use serde::Serialize;
 use std::io::{self, Write};
