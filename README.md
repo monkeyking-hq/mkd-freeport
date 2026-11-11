@@ -67,7 +67,7 @@ Discovery releases sockets before returning, so another process can claim a repo
 
 ## Output
 
-Default output is a compact JSON envelope aligned with the mkd-cli machine-first contract. Example discovery result (the actual port varies):
+Default output is a compact JSON envelope for scripts and automation. Example discovery result (the actual port varies):
 
 ```json
 {"result":"OK","message":"Free ports found","data":{"port":49152,"strategy":"random","protocol":"tcp","bind_address":"0.0.0.0","reserved":false}}
@@ -90,8 +90,6 @@ PORT=$(mkd-freeport --plain)
 ```
 
 `--format compact|json|human` selects compact JSON, pretty JSON, or readable text. `--plain` prints one port per line. Allocation errors exit with a nonzero status; JSON errors include `result: "ERROR"`, `level`, `message`, and `error_code`. Human-readable errors go to stderr.
-
-Refs: mkd#47 (mkd-cli contract), mkd#81 (this tool).
 
 ## Rust API
 

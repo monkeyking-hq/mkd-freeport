@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-//! Machine-first default output contract (mkd#81).
+//! Default machine-readable CLI output contract.
 
 use std::process::Command;
 

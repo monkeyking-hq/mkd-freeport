@@ -1,7 +1,5 @@
 # SPDX-FileCopyrightText: 2026 Nathan A Chadwick
 # SPDX-License-Identifier: MIT
-#
-# Gitea Actions on MonkeyKing.dev. Not GitHub.
 
 name: CI
 
