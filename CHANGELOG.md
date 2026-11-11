@@ -1,5 +1,8 @@
 ## Unreleased
 
+### Changed (2026-11-11)
+- Updated README for 0.3.0 CLI options, output metadata, foreground reservations, and public Rust APIs.
+
 ### Changed (2026-09-20 change protocol)
 - Change Protocol alignment (2026-09-20): monitor PR CI, fix failures, **auto-merge on the forge when green**, auto-advance to the next task; coding tasks delegated to The Smith (`mkd-agent/agents/thesmith.md`); compact summary after each finished task. Canonical: `mkd/platform/standards/agent/change-protocol.md`.
 
