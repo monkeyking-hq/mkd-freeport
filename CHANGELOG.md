@@ -1,6 +1,7 @@
 ## Unreleased
 
 ### Changed (2026-11-11)
+- Set package repository metadata to the public GitHub mirror.
 - Rewrote AGENTS.md with current CLI/library contracts, source map, release-only verification, and socket-test guidance.
 - Removed private infrastructure references from package metadata, documentation, comments, and shared agent instructions; kept local agent rules untracked.
 - Updated README for 0.3.0 CLI options, output metadata, foreground reservations, and public Rust APIs.
