@@ -19,17 +19,16 @@ pub enum OutputFormat {
     Human,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub enum PortStrategy {
-    First,
-    Random,
-}
-
 #[derive(Debug, Clone, Serialize)]
 pub struct PortData {
-    pub port: u16,
-    pub strategy: PortStrategy,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub port: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ports: Option<Vec<u16>>,
+    pub strategy: &'static str,
+    pub protocol: &'static str,
+    pub bind_address: std::net::IpAddr,
+    pub reserved: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -57,30 +56,49 @@ struct CliResponse {
     error_code: Option<String>,
 }
 
-pub fn print_success(port: u16, strategy: PortStrategy, format: OutputFormat) -> io::Result<()> {
+pub fn print_success(
+    ports: &[u16],
+    options: &mkd_freeport::AllocationOptions,
+    reserved: bool,
+    format: OutputFormat,
+) -> io::Result<()> {
     match format {
         OutputFormat::Human => {
-            let label = match strategy {
-                PortStrategy::First => "first available above 1024",
-                PortStrategy::Random => "random ephemeral",
-            };
-            writeln!(io::stdout(), "Port {port} ({label}, bind-checked)")
+            let label = if reserved { "reserved" } else { "bind-checked" };
+            for port in ports {
+                writeln!(
+                    io::stdout(),
+                    "Port {port} ({}, {}, {}, {label})",
+                    options.protocol.as_str(),
+                    options.bind_address,
+                    options.strategy.as_str()
+                )?;
+            }
+            Ok(())
         }
         OutputFormat::Compact | OutputFormat::Json => {
             let response = CliResponse {
                 result: ResultCode::Ok,
-                message: "Free TCP port allocated".to_string(),
+                message: if reserved {
+                    "Ports reserved"
+                } else {
+                    "Free ports found"
+                }
+                .into(),
                 level: None,
-                data: Some(PortData { port, strategy }),
+                data: Some(PortData {
+                    port: (ports.len() == 1).then(|| ports[0]),
+                    ports: (ports.len() != 1).then(|| ports.to_vec()),
+                    strategy: options.strategy.as_str(),
+                    protocol: options.protocol.as_str(),
+                    bind_address: options.bind_address,
+                    reserved,
+                }),
                 error_code: None,
             };
             emit_json(&response, format)
         }
     }
-}
-
-pub fn print_plain_port(port: u16) -> io::Result<()> {
-    writeln!(io::stdout(), "{port}")
 }
 
 pub fn print_error(
@@ -115,4 +133,27 @@ fn emit_json<T: Serialize>(value: &T, format: OutputFormat) -> io::Result<()> {
         OutputFormat::Human => unreachable!("human handled separately"),
     };
     writeln!(io::stdout(), "{line}")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn single_and_multiple_shapes() {
+        for ports in [vec![50000], vec![50000, 50001]] {
+            let data = PortData {
+                port: (ports.len() == 1).then(|| ports[0]),
+                ports: (ports.len() > 1).then(|| ports.clone()),
+                strategy: "random",
+                protocol: "udp",
+                bind_address: "::1".parse().unwrap(),
+                reserved: true,
+            };
+            let value = serde_json::to_value(data).unwrap();
+            assert_eq!(value["reserved"], true);
+            assert_eq!(value["bind_address"], "::1");
+            assert_eq!(value.get("port").is_some(), ports.len() == 1);
+            assert_eq!(value.get("ports").is_some(), ports.len() > 1);
+        }
+    }
 }

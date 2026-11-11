@@ -4,9 +4,9 @@
 
 [package]
 name = "mkd-freeport"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
-description = "Find available free TCP ports for scripts and AI agents"
+description = "Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts and AI agents"
 license = "MIT"
 repository = "http://stonemonkey:37373/MonkeyKing.dev/mkd-freeport"
 
@@ -15,6 +15,9 @@ clap = { version = "4.5", features = ["derive"] }
 rand = "0.10"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1"
+socket2 = "0.6"
+signal-hook-registry = "1.4"
+libc = "0.2"
 
 [profile.release]
 lto = true
