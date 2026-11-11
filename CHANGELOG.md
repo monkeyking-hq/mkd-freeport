@@ -16,6 +16,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-11-11
+### Fixed
+- Completed CLI help with output-format descriptions, default ranges, allocation and timeout constraints, JSON examples, and discovery/reservation lifetime and handoff details.
+
 ## [0.3.0] - 2026-11-11
 ### Added
 - Public Rust APIs for single/multiple-port discovery and owned socket reservations.
