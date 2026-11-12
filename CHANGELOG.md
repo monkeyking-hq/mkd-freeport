@@ -1,6 +1,7 @@
 ## Unreleased
 
 ### Changed (2026-11-11)
+- Documented crates.io CLI installation and the published library dependency.
 - Set package repository metadata to the public GitHub mirror.
 - Rewrote AGENTS.md with current CLI/library contracts, source map, release-only verification, and socket-test guidance.
 - Removed private infrastructure references from package metadata, documentation, comments, and shared agent instructions; kept local agent rules untracked.
