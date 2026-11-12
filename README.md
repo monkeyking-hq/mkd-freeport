@@ -8,7 +8,13 @@ Discover or reserve TCP/UDP ports over IPv4 and IPv6 for scripts, AI agents, and
 
 ## Install
 
-From this repository:
+Install the published CLI from [crates.io](https://crates.io/crates/mkd-freeport):
+
+```bash
+cargo install mkd-freeport --locked
+```
+
+Or install from a local checkout of this repository:
 
 ```bash
 cargo install --path .
@@ -93,11 +99,11 @@ PORT=$(mkd-freeport --plain)
 
 ## Rust API
 
-For a crate in a sibling directory, add the local checkout as a dependency:
+Add the published library as a dependency:
 
 ```toml
 [dependencies]
-mkd-freeport = { path = "../mkd-freeport" }
+mkd-freeport = "0.3.1"
 ```
 
 ```rust
