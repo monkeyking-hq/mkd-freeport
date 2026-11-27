@@ -17,6 +17,22 @@ fn can_bind(protocol: Protocol, ip: IpAddr, port: u16) -> bool {
         Protocol::Udp => UdpSocket::bind((ip, port)).is_ok(),
     }
 }
+fn is_af_not_supported(err: &std::io::Error) -> bool {
+    #[cfg(unix)]
+    {
+        err.raw_os_error() == Some(libc::EAFNOSUPPORT)
+    }
+    #[cfg(windows)]
+    {
+        err.raw_os_error() == Some(10047)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = err;
+        false
+    }
+}
+
 fn ipv6_available(protocol: Protocol) -> bool {
     let result = match protocol {
         Protocol::Tcp => TcpListener::bind(("::1", 0)).map(|_| ()),
@@ -28,7 +44,7 @@ fn ipv6_available(protocol: Protocol) -> bool {
             if matches!(
                 e.kind(),
                 std::io::ErrorKind::AddrNotAvailable | std::io::ErrorKind::Unsupported
-            ) || e.raw_os_error() == Some(libc::EAFNOSUPPORT) =>
+            ) || is_af_not_supported(&e) =>
         {
             eprintln!("IPv6 unavailable: {e}");
             false

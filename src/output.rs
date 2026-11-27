@@ -7,17 +7,7 @@
 use serde::Serialize;
 use std::io::{self, Write};
 
-/// Output format for command results (default: compact single-line JSON envelope).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, clap::ValueEnum)]
-pub enum OutputFormat {
-    /// Canonical single-line JSON envelope (default). Best for agents and scripting with `jq`.
-    #[default]
-    Compact,
-    /// Pretty-printed JSON envelope.
-    Json,
-    /// Human-readable text (no JSON).
-    Human,
-}
+pub use crate::cli::OutputFormat;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct PortData {

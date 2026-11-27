@@ -165,13 +165,29 @@ fn cli_singleton_range_and_ipv6_inference() {
     assert_eq!(value["data"]["strategy"], "first");
     assert_eq!(value["data"]["reserved"], false);
 
+    fn is_af_not_supported(err: &std::io::Error) -> bool {
+        #[cfg(unix)]
+        {
+            err.raw_os_error() == Some(libc::EAFNOSUPPORT)
+        }
+        #[cfg(windows)]
+        {
+            err.raw_os_error() == Some(10047)
+        }
+        #[cfg(not(any(unix, windows)))]
+        {
+            let _ = err;
+            false
+        }
+    }
+
     match TcpListener::bind(("::1", 0)) {
         Ok(probe) => drop(probe),
         Err(e)
             if matches!(
                 e.kind(),
                 std::io::ErrorKind::AddrNotAvailable | std::io::ErrorKind::Unsupported
-            ) || e.raw_os_error() == Some(libc::EAFNOSUPPORT) =>
+            ) || is_af_not_supported(&e) =>
         {
             eprintln!("IPv6 unavailable: {e}");
             return;

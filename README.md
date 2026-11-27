@@ -4,15 +4,77 @@
 
 Discover or reserve TCP/UDP ports over IPv4 and IPv6 for scripts, AI agents, and CI pipelines. Includes a CLI and a public Rust API.
 
-**Version 0.3.1**
+**Version 0.4.0**
 
 ## Install
+
+### Cargo & `cargo-binstall`
 
 Install the published CLI from [crates.io](https://crates.io/crates/mkd-freeport):
 
 ```bash
 cargo install mkd-freeport --locked
 ```
+
+Or download a prebuilt binary via [`cargo-binstall`](https://github.com/cargo-bins/cargo-binstall):
+
+```bash
+cargo binstall mkd-freeport
+```
+
+### Arch Linux & Omarchy
+
+On Omarchy (via AUR):
+
+```bash
+omarchy pkg aur add mkd-freeport
+```
+
+On Arch Linux with an AUR helper:
+
+```bash
+paru -S mkd-freeport
+# or: yay -S mkd-freeport
+```
+
+### Debian / Ubuntu (`.deb`)
+
+Download the `.deb` for `amd64` or `arm64` from [GitHub Releases](https://github.com/monkeyking-hq/mkd-freeport/releases/latest) and install:
+
+```bash
+sudo apt install ./mkd-freeport_*_amd64.deb
+```
+
+### Fedora & EPEL (`.rpm` / COPR)
+
+Download the `.rpm` for `x86_64` or `aarch64` from [GitHub Releases](https://github.com/monkeyking-hq/mkd-freeport/releases/latest):
+
+```bash
+sudo dnf install ./mkd-freeport-*.x86_64.rpm
+```
+
+Native `.spec` recipes for Fedora and EPEL 9/10 live under [`packaging/rpm/`](packaging/rpm/mkd-freeport.spec).
+
+### macOS (Homebrew)
+
+```bash
+brew install monkeyking-hq/tap/mkd-freeport
+```
+
+### Windows (Winget & Scoop)
+
+```powershell
+# Scoop
+scoop bucket add monkeyking.dev https://github.com/monkeyking-hq/scoop-bucket
+scoop install mkd-freeport
+
+# Winget
+winget install MonkeyKingDev.mkd-freeport
+```
+
+### Prebuilt Archives & Source
+
+Prebuilt `.tar.gz` (Linux static musl, macOS) and `.zip` (Windows) archives with `SHA256SUMS`, man pages, and shell completions are published on [GitHub Releases](https://github.com/monkeyking-hq/mkd-freeport/releases).
 
 Or install from a local checkout of this repository:
 
@@ -21,6 +83,20 @@ cargo install --path .
 ```
 
 `cargo install` builds in release mode by default.
+
+### Man Pages & Shell Completions
+
+OS packages (`.deb`, `.rpm`, Arch, Homebrew) install `mkd-freeport(1)` and shell completions automatically:
+
+```bash
+man mkd-freeport
+```
+
+Prebuilt release archives include `man/mkd-freeport.1` (and `man/mkd-freeport.1.txt` on Windows) plus completions under `completions/` for Bash, Zsh, Fish, and PowerShell (`_mkd-freeport.ps1`). To generate them locally from source:
+
+```bash
+cargo run --release -p xtask -- dist-assets --out-dir dist/assets
+```
 
 ## Usage
 
@@ -103,7 +179,7 @@ Add the published library as a dependency:
 
 ```toml
 [dependencies]
-mkd-freeport = "0.3.1"
+mkd-freeport = "0.4.0"
 ```
 
 ```rust

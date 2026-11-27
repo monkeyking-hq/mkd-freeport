@@ -1,0 +1,376 @@
+# SPDX-FileCopyrightText: 2026 Nathan A Chadwick
+# SPDX-License-Identifier: MIT
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            archive: tar.gz
+            cross: true
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            archive: tar.gz
+            cross: true
+          - target: aarch64-apple-darwin
+            os: macos-15
+            archive: tar.gz
+            cross: false
+          - target: x86_64-apple-darwin
+            os: macos-15
+            archive: tar.gz
+            cross: false
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            archive: zip
+            cross: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup cross toolchain (Linux musl)
+        if: matrix.cross
+        uses: taiki-e/setup-cross-toolchain-action@v1
+        with:
+          target: ${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --locked --target ${{ matrix.target }} --bin mkd-freeport
+
+      - name: Generate man page & completions
+        run: cargo run --release --locked -p xtask -- dist-assets --out-dir dist/assets
+
+      - name: Stage & archive (Unix)
+        if: matrix.archive == 'tar.gz'
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" != v* ]]; then
+            TAG="v$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n1)"
+          fi
+          NAME="mkd-freeport-${TAG}-${{ matrix.target }}"
+          STAGE="dist/${NAME}"
+          mkdir -p "${STAGE}/man" "${STAGE}/completions"
+          cp "target/${{ matrix.target }}/release/mkd-freeport" "${STAGE}/"
+          cp dist/assets/man/mkd-freeport.1 "${STAGE}/man/"
+          cp dist/assets/completions/mkd-freeport.bash "${STAGE}/completions/"
+          cp dist/assets/completions/_mkd-freeport "${STAGE}/completions/"
+          cp dist/assets/completions/mkd-freeport.fish "${STAGE}/completions/"
+          cp LICENSE README.md "${STAGE}/"
+          tar -C dist -czf "dist/${NAME}.tar.gz" "${NAME}"
+
+      - name: Stage & archive (Windows)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          if (-not $tag.StartsWith("v")) {
+            $ver = (Select-String -Path Cargo.toml -Pattern '^version = "([^"]+)"' | Select-Object -First 1).Matches.Groups[1].Value
+            $tag = "v$ver"
+          }
+          $name = "mkd-freeport-$tag-${{ matrix.target }}"
+          $stage = "dist/$name"
+          New-Item -ItemType Directory -Force -Path "$stage/man", "$stage/completions" | Out-Null
+          Copy-Item "target/${{ matrix.target }}/release/mkd-freeport.exe" "$stage/"
+          Copy-Item "dist/assets/man/mkd-freeport.1.txt" "$stage/man/"
+          Copy-Item "dist/assets/completions/_mkd-freeport.ps1" "$stage/completions/"
+          Copy-Item "LICENSE", "README.md" "$stage/"
+          Compress-Archive -Path $stage -DestinationPath "dist/$name.zip" -Force
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}
+          path: dist/mkd-freeport-*.${{ matrix.archive }}
+
+      - name: Upload Linux binary & assets
+        if: contains(matrix.target, 'linux-musl')
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-bin-${{ matrix.target }}
+          path: |
+            target/${{ matrix.target }}/release/mkd-freeport
+            dist/assets/
+
+  packages-deb:
+    name: Package .deb
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          targets: x86_64-unknown-linux-musl,aarch64-unknown-linux-musl
+
+      - uses: taiki-e/install-action@cargo-deb
+
+      - name: Download x86_64-unknown-linux-musl
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-bin-x86_64-unknown-linux-musl
+          path: .
+
+      - name: Download aarch64-unknown-linux-musl
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-bin-aarch64-unknown-linux-musl
+          path: .
+
+      - name: Build .deb packages
+        run: |
+          set -euo pipefail
+          chmod +x target/x86_64-unknown-linux-musl/release/mkd-freeport target/aarch64-unknown-linux-musl/release/mkd-freeport
+          gzip -n -9 -f -k dist/assets/man/mkd-freeport.1
+          mkdir -p dist/deb
+          cargo deb --no-build --no-strip --target x86_64-unknown-linux-musl -o dist/deb/
+          cargo deb --no-build --no-strip --target aarch64-unknown-linux-musl -o dist/deb/
+          ls -la dist/deb/
+
+      - name: Smoke test .deb in Debian & Ubuntu containers
+        run: |
+          set -euo pipefail
+          DEB_FILE="$(ls dist/deb/*_amd64.deb | head -n1)"
+          DEB_NAME="$(basename "$DEB_FILE")"
+          for image in debian:bookworm ubuntu:24.04; do
+            echo "=== Testing $DEB_NAME on $image ==="
+            docker run --rm -v "$(pwd)/dist/deb:/pkg:ro" "$image" bash -c "
+              set -euo pipefail
+              apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq man-db >/dev/null
+              dpkg -i '/pkg/${DEB_NAME}'
+              mkd-freeport --version
+              mkd-freeport --plain
+              man -w mkd-freeport
+            "
+          done
+
+      - name: Upload .deb artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-deb
+          path: dist/deb/*.deb
+
+  packages-rpm:
+    name: Package .rpm
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: taiki-e/install-action@cargo-generate-rpm
+
+      - name: Download x86_64-unknown-linux-musl
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-bin-x86_64-unknown-linux-musl
+          path: .
+
+      - name: Download aarch64-unknown-linux-musl
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-bin-aarch64-unknown-linux-musl
+          path: .
+
+      - name: Build .rpm packages
+        run: |
+          set -euo pipefail
+          VER="$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n1)"
+          gzip -n -9 -f -k dist/assets/man/mkd-freeport.1
+          mkdir -p target/release dist/rpm
+
+          cp target/x86_64-unknown-linux-musl/release/mkd-freeport target/release/mkd-freeport
+          chmod +x target/release/mkd-freeport
+          cargo generate-rpm --arch x86_64 -o "dist/rpm/mkd-freeport-${VER}-1.x86_64.rpm"
+
+          cp target/aarch64-unknown-linux-musl/release/mkd-freeport target/release/mkd-freeport
+          chmod +x target/release/mkd-freeport
+          cargo generate-rpm --arch aarch64 -o "dist/rpm/mkd-freeport-${VER}-1.aarch64.rpm"
+          ls -la dist/rpm/
+
+      - name: Smoke test .rpm in Fedora & AlmaLinux 9 containers
+        run: |
+          set -euo pipefail
+          RPM_FILE="$(ls dist/rpm/*.x86_64.rpm | head -n1)"
+          RPM_NAME="$(basename "$RPM_FILE")"
+          for image in fedora:latest almalinux:9; do
+            echo "=== Testing $RPM_NAME on $image ==="
+            docker run --rm -v "$(pwd)/dist/rpm:/pkg:ro" "$image" bash -c "
+              set -euo pipefail
+              dnf install -y -q man-db '/pkg/${RPM_NAME}'
+              mkd-freeport --version
+              mkd-freeport --plain
+              man -w mkd-freeport
+            "
+          done
+
+      - name: Upload .rpm artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-rpm
+          path: dist/rpm/*.rpm
+
+  verify-arch:
+    name: Verify Arch PKGBUILD
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build & test PKGBUILD in archlinux container
+        run: |
+          set -euo pipefail
+          VER="$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n1)"
+          mkdir -p dist/arch
+          git archive --format=tar.gz --prefix="mkd-freeport-${VER}/" HEAD > "dist/arch/mkd-freeport-${VER}.tar.gz"
+          cp packaging/arch/PKGBUILD dist/arch/PKGBUILD
+          sed -i "s|^pkgver=.*|pkgver=${VER}|" dist/arch/PKGBUILD
+          sed -i "s|^source=.*|source=(\"mkd-freeport-${VER}.tar.gz\")|" dist/arch/PKGBUILD
+
+          docker run --rm -v "$(pwd)/dist/arch:/src:ro" archlinux:latest bash -c '
+            set -euo pipefail
+            pacman -Syu --noconfirm --needed base-devel rust man-db >/dev/null
+            useradd -m builder
+            mkdir -p /home/builder/pkg
+            cp /src/* /home/builder/pkg/
+            chown -R builder:builder /home/builder/pkg
+            su - builder -c "cd /home/builder/pkg && makepkg -s --noconfirm"
+            pacman -U --noconfirm /home/builder/pkg/*.pkg.tar.zst
+            mkd-freeport --version
+            mkd-freeport --plain
+            man -w mkd-freeport
+          '
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build, packages-deb, packages-rpm, verify-arch]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: raw-artifacts
+
+      - name: Collect release assets & SHA256SUMS
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          find raw-artifacts -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.deb' -o -name '*.rpm' \) -exec mv {} release-assets/ \;
+          (cd release-assets && sha256sum * > SHA256SUMS)
+          ls -la release-assets/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          gh release create "$TAG" release-assets/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "$TAG" \
+            --generate-notes
+
+  update-homebrew:
+    name: Update Homebrew Tap
+    needs: publish-release
+    if: startsWith(github.ref, 'refs/tags/v') && secrets.HOMEBREW_TAP_TOKEN != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update monkeyking-hq/homebrew-tap
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VER="${TAG#v}"
+          curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/SHA256SUMS" -o SHA256SUMS
+          sha_for() { grep "  $1$" SHA256SUMS | awk '{print $1}'; }
+          MAC_ARM="$(sha_for "mkd-freeport-${TAG}-aarch64-apple-darwin.tar.gz")"
+          MAC_X64="$(sha_for "mkd-freeport-${TAG}-x86_64-apple-darwin.tar.gz")"
+          LIN_ARM="$(sha_for "mkd-freeport-${TAG}-aarch64-unknown-linux-musl.tar.gz")"
+          LIN_X64="$(sha_for "mkd-freeport-${TAG}-x86_64-unknown-linux-musl.tar.gz")"
+
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/monkeyking-hq/homebrew-tap.git" tap
+          mkdir -p tap/Formula
+          cp packaging/homebrew/mkd-freeport.rb tap/Formula/mkd-freeport.rb
+          sed -i "s|version \".*\"|version \"${VER}\"|" tap/Formula/mkd-freeport.rb
+          sed -i "s|REPLACE_WITH_MACOS_ARM64_SHA256|${MAC_ARM}|" tap/Formula/mkd-freeport.rb
+          sed -i "s|REPLACE_WITH_MACOS_X86_64_SHA256|${MAC_X64}|" tap/Formula/mkd-freeport.rb
+          sed -i "s|REPLACE_WITH_LINUX_ARM64_SHA256|${LIN_ARM}|" tap/Formula/mkd-freeport.rb
+          sed -i "s|REPLACE_WITH_LINUX_X86_64_SHA256|${LIN_X64}|" tap/Formula/mkd-freeport.rb
+          cd tap
+          git config user.name "monkeykinghq-bot"
+          git config user.email "monkey@monkeyking.dev"
+          git add Formula/mkd-freeport.rb
+          git commit -m "mkd-freeport ${VER}"
+          git push
+
+  update-scoop:
+    name: Update Scoop Bucket
+    needs: publish-release
+    if: startsWith(github.ref, 'refs/tags/v') && secrets.SCOOP_BUCKET_TOKEN != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update monkeyking-hq/scoop-bucket
+        env:
+          GH_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VER="${TAG#v}"
+          curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/SHA256SUMS" -o SHA256SUMS
+          WIN_SHA="$(grep "  mkd-freeport-${TAG}-x86_64-pc-windows-msvc.zip$" SHA256SUMS | awk '{print $1}')"
+
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/monkeyking-hq/scoop-bucket.git" bucket
+          mkdir -p bucket/bucket
+          cp packaging/windows/scoop/mkd-freeport.json bucket/bucket/mkd-freeport.json
+          sed -i "s|\"version\": \".*\"|\"version\": \"${VER}\"|" bucket/bucket/mkd-freeport.json
+          sed -i "s|v0\.4\.0|${TAG}|g" bucket/bucket/mkd-freeport.json
+          sed -i "s|REPLACE_WITH_WINDOWS_X86_64_SHA256|${WIN_SHA}|" bucket/bucket/mkd-freeport.json
+          cd bucket
+          git config user.name "monkeykinghq-bot"
+          git config user.email "monkey@monkeyking.dev"
+          git add bucket/mkd-freeport.json
+          git commit -m "mkd-freeport: Update to version ${VER}"
+          git push
+
+  update-winget:
+    name: Update Winget Manifest
+    needs: publish-release
+    if: startsWith(github.ref, 'refs/tags/v') && secrets.WINGET_TOKEN != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit Winget PR
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: MonkeyKingDev.mkd-freeport
+          version: ${{ github.ref_name }}
+          installers-regex: '\.zip$'
+          token: ${{ secrets.WINGET_TOKEN }}

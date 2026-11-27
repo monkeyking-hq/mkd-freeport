@@ -1,0 +1,26 @@
+{
+    "version": "0.4.0",
+    "description": "Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts and AI agents",
+    "homepage": "https://github.com/monkeyking-hq/mkd-freeport",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/monkeyking-hq/mkd-freeport/releases/download/v0.4.0/mkd-freeport-v0.4.0-x86_64-pc-windows-msvc.zip",
+            "hash": "REPLACE_WITH_WINDOWS_X86_64_SHA256",
+            "extract_dir": "mkd-freeport-v0.4.0-x86_64-pc-windows-msvc"
+        }
+    },
+    "bin": "mkd-freeport.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/monkeyking-hq/mkd-freeport/releases/download/v$version/mkd-freeport-v$version-x86_64-pc-windows-msvc.zip",
+                "extract_dir": "mkd-freeport-v$version-x86_64-pc-windows-msvc"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/SHA256SUMS"
+        }
+    }
+}

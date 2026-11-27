@@ -1,0 +1,7 @@
+{
+  "source": "local",
+  "auto_merge": true,
+  "upstream": {
+    "watch": "github:monkeyking-hq/mkd-freeport"
+  }
+}
