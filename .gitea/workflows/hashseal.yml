@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 Nathan A Chadwick
+# SPDX-License-Identifier: MIT
+#
+# Gitea Actions on MonkeyKing.dev — Tier 2 HashSeal instruction integrity gate.
+
+name: hashseal
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install hashseal v0.7.0
+        env:
+          BASE_URL: "${{ github.server_url }}/MonkeyKing.dev/hashseal/releases/download/v0.7.0"
+        run: |
+          set -euo pipefail
+          TMP="$(mktemp -d)"
+          trap 'rm -rf "$TMP"' EXIT
+          curl -fsSL "$BASE_URL/hashseal-x86_64-unknown-linux-gnu.tar.gz" -o "$TMP/hashseal-x86_64-unknown-linux-gnu.tar.gz"
+          curl -fsSL "$BASE_URL/SHA256SUMS" -o "$TMP/SHA256SUMS"
+          (cd "$TMP" && sha256sum -c SHA256SUMS)
+          tar -xzf "$TMP/hashseal-x86_64-unknown-linux-gnu.tar.gz" -C "$TMP"
+          install -d -m 755 "$HOME/.local/bin"
+          install -m 755 "$TMP/hashseal" "$HOME/.local/bin/hashseal"
+          install -m 755 "$TMP/hashseal-check" "$HOME/.local/bin/hashseal-check"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/hashseal" --version
+
+      - name: Verify sealed instruction files
+        run: hashseal check --root .

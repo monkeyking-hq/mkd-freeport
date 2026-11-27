@@ -1,5 +1,8 @@
 ## Unreleased
 
+### Added (2026-11-26)
+- Wired Tier 2 HashSeal instruction integrity gate (`.hashseal.json`, `.gitea/workflows/hashseal.yml`, and digest seal on `AGENTS.md`). Docs/CI-only; no version bump.
+
 ### Changed (2026-11-11)
 - Documented crates.io CLI installation and the published library dependency.
 - Set package repository metadata to the public GitHub mirror.
