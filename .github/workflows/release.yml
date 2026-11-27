@@ -228,7 +228,7 @@ jobs:
             echo "=== Testing $RPM_NAME on $image ==="
             docker run --rm -v "$(pwd)/dist/rpm:/pkg:ro" "$image" bash -c "
               set -euo pipefail
-              dnf install -y -q man-db '/pkg/${RPM_NAME}'
+              dnf install -y -q --setopt=tsflags= man-db '/pkg/${RPM_NAME}'
               mkd-freeport --version
               mkd-freeport --plain
               man -w mkd-freeport
@@ -269,8 +269,8 @@ jobs:
             pacman -U --noconfirm /home/builder/pkg/*.pkg.tar.zst
             mkd-freeport --version
             mkd-freeport --plain
-            mandb -q
-            man -w mkd-freeport
+            pacman -Qlp /home/builder/pkg/mkd-freeport-[0-9]*.pkg.tar.zst | grep -q 'usr/share/man/man1/mkd-freeport.1'
+            pacman -Qlp /home/builder/pkg/mkd-freeport-[0-9]*.pkg.tar.zst | grep -q 'usr/share/licenses/mkd-freeport/LICENSE'
           '
 
   publish-release:
