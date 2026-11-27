@@ -1,3 +1,6 @@
+---
+hashseal: "blake3:93b7b81e82c7838831c569f9aaa3345ba98c06f696622e263390607661993ba0"
+---
 <!--
 SPDX-FileCopyrightText: 2026 Nathan A Chadwick
 SPDX-License-Identifier: MIT

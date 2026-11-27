@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "document": {
+    "enable": true,
+    "canonical": "full",
+    "field": "hashseal",
+    "unicode_policy": "fail"
+  },
+  "signing": {
+    "enable": false,
+    "require": false
+  },
+  "walk": {
+    "respect_gitignore": true
+  },
+  "report": {
+    "write": false
+  }
+}
