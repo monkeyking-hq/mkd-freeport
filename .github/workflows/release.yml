@@ -184,7 +184,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: taiki-e/install-action@cargo-generate-rpm
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@cargo-binstall
+
+      - name: Install cargo-generate-rpm
+        run: cargo binstall -y cargo-generate-rpm
 
       - name: Download x86_64-unknown-linux-musl
         uses: actions/download-artifact@v4
@@ -264,6 +269,7 @@ jobs:
             pacman -U --noconfirm /home/builder/pkg/*.pkg.tar.zst
             mkd-freeport --version
             mkd-freeport --plain
+            mandb -q
             man -w mkd-freeport
           '
 
