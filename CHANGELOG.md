@@ -1,7 +1,17 @@
 ## Unreleased
 
-### Added (2026-11-26)
-- Wired Tier 2 HashSeal instruction integrity gate (`.hashseal.json`, `.gitea/workflows/hashseal.yml`, and digest seal on `AGENTS.md`). Docs/CI-only; no version bump.
+## [0.4.0] - 2026-11-27
+
+### Added
+- Cross-platform signal handling via `ctrlc` (supporting Windows `CTRL_C`/`CTRL_BREAK`/`CTRL_CLOSE` alongside Unix `SIGINT`/`SIGTERM`) and cross-platform IPv6 test probes, removing `libc` from runtime dependencies.
+- `xtask` workspace helper generating `man/mkd-freeport.1`, plain-text `man/mkd-freeport.1.txt`, and Bash, Zsh, Fish, and PowerShell completions from the shared `clap` CLI definition (`src/cli.rs`).
+- Multi-platform GitHub Actions CI matrix (`.github/workflows/ci.yml` for Linux, macOS, Windows) and automated release pipeline (`.github/workflows/release.yml` for static musl Linux, macOS, Windows, `.deb`, `.rpm`, Arch `makepkg` verification, and downstream Homebrew/Scoop/Winget hooks).
+- Packaging metadata (`[package.metadata.binstall]`, `[package.metadata.deb]`, `[package.metadata.generate-rpm]`) and distro recipes under `packaging/` for Arch Linux (AUR), Omarchy, Fedora/EPEL (`.spec`), Homebrew, Scoop, and Winget.
+- Per-platform installation, man page, and shell completion documentation in `README.md`.
+
+### Changed
+- Declared `rust-version = "1.85"` in `Cargo.toml` and enabled `strip = true` in `[profile.release]`.
+- Wired Tier 2 HashSeal instruction integrity gate (`.hashseal.json`, `.gitea/workflows/hashseal.yml`, and digest seal on `AGENTS.md`).
 
 ### Changed (2026-11-11)
 - Documented crates.io CLI installation and the published library dependency.

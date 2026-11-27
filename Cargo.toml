@@ -2,26 +2,81 @@
 #
 # SPDX-License-Identifier: MIT
 
+[workspace]
+members = [".", "xtask"]
+
 [package]
 name = "mkd-freeport"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
+rust-version = "1.85"
 description = "Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts and AI agents"
 license = "MIT"
 repository = "https://github.com/monkeyking-hq/mkd-freeport"
+readme = "README.md"
+keywords = ["port", "freeport", "networking", "cli", "tcp"]
+categories = ["command-line-utilities", "network-programming"]
+exclude = [
+    "xtask/",
+    "packaging/",
+    ".github/",
+    ".gitea/",
+    ".hashseal.json",
+    "scripts/",
+    "renovate.json",
+]
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
+ctrlc = { version = "3.4", features = ["termination"] }
 rand = "0.10"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1"
 socket2 = "0.6"
-signal-hook-registry = "1.4"
+
+[target.'cfg(unix)'.dev-dependencies]
 libc = "0.2"
 
 [profile.release]
 lto = true
 codegen-units = 1
+strip = true
 
-[dev-dependencies]
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }{ archive-suffix }"
+bin-dir = "{ name }-v{ version }-{ target }/{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
 
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
+
+[package.metadata.deb]
+maintainer = "Nathan A Chadwick <nate@monkeyking.dev>"
+copyright = "2026 Nathan A Chadwick"
+license-file = ["LICENSE", "0"]
+extended-description = """\
+Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts, AI agents, and CI pipelines.\
+"""
+depends = ""
+section = "net"
+priority = "optional"
+assets = [
+    ["target/release/mkd-freeport", "usr/bin/mkd-freeport", "755"],
+    ["dist/assets/man/mkd-freeport.1.gz", "usr/share/man/man1/mkd-freeport.1.gz", "644"],
+    ["dist/assets/completions/mkd-freeport.bash", "usr/share/bash-completion/completions/mkd-freeport", "644"],
+    ["dist/assets/completions/_mkd-freeport", "usr/share/zsh/vendor-completions/_mkd-freeport", "644"],
+    ["dist/assets/completions/mkd-freeport.fish", "usr/share/fish/vendor_completions.d/mkd-freeport.fish", "644"],
+    ["README.md", "usr/share/doc/mkd-freeport/README.md", "644"],
+]
+
+[package.metadata.generate-rpm]
+auto-req = "no"
+assets = [
+    { source = "target/release/mkd-freeport", dest = "/usr/bin/mkd-freeport", mode = "755" },
+    { source = "dist/assets/man/mkd-freeport.1.gz", dest = "/usr/share/man/man1/mkd-freeport.1.gz", mode = "644", doc = true },
+    { source = "dist/assets/completions/mkd-freeport.bash", dest = "/usr/share/bash-completion/completions/mkd-freeport", mode = "644" },
+    { source = "dist/assets/completions/_mkd-freeport", dest = "/usr/share/zsh/site-functions/_mkd-freeport", mode = "644" },
+    { source = "dist/assets/completions/mkd-freeport.fish", dest = "/usr/share/fish/vendor_completions.d/mkd-freeport.fish", mode = "644" },
+    { source = "LICENSE", dest = "/usr/share/licenses/mkd-freeport/LICENSE", mode = "644", doc = true },
+    { source = "README.md", dest = "/usr/share/doc/mkd-freeport/README.md", mode = "644", doc = true },
+]
