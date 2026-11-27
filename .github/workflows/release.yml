@@ -59,7 +59,9 @@ jobs:
           target: ${{ matrix.target }}
 
       - name: Build release binary
-        run: cargo build --release --locked --target ${{ matrix.target }} --bin mkd-freeport
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo build --release --locked --target ${{ matrix.target }} --bin mkd-freeport
 
       - name: Generate man page & completions
         run: cargo run --release --locked -p xtask -- dist-assets --out-dir dist/assets
