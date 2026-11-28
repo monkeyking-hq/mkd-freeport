@@ -1,0 +1,16 @@
+[book]
+title = "mkd-freeport"
+authors = ["Nathan A Chadwick"]
+description = "Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts, AI agents, and CI pipelines."
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+git-repository-url = "https://github.com/monkeyking-hq/mkd-freeport"
+edit-url-template = "https://github.com/monkeyking-hq/mkd-freeport/edit/main/docs/{path}"
+default-theme = "ayu"
+preferred-dark-theme = "ayu"
+site-url = "/mkd-freeport/"

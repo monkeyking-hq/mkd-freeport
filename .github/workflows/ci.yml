@@ -43,6 +43,15 @@ jobs:
       - name: Test
         run: cargo test --release --workspace -- --quiet
 
+      - name: Run Rust & CLI examples
+        if: matrix.os != 'windows-latest'
+        run: |
+          cargo build --release --bin mkd-freeport
+          cargo run --release --example basic_discovery
+          cargo run --release --example custom_range
+          cargo run --release --example reserve_udp
+          MKD_FREEPORT="$(pwd)/target/release/mkd-freeport" ./examples/cli/run-all.sh
+
       - name: Generate man page & completions
         run: cargo run --release -p xtask -- dist-assets --out-dir dist/assets
 

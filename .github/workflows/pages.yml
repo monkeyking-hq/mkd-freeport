@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: 2026 Nathan A Chadwick
+# SPDX-License-Identifier: MIT
+
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build mdBook & VHS demos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Setup musl cross toolchain
+        uses: taiki-e/setup-cross-toolchain-action@v1
+        with:
+          target: x86_64-unknown-linux-musl
+
+      - name: Build static Linux binary
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          cargo build --release --locked --target x86_64-unknown-linux-musl --bin mkd-freeport
+
+      - name: Verify executable CLI examples
+        run: MKD_FREEPORT="$(pwd)/target/x86_64-unknown-linux-musl/release/mkd-freeport" ./examples/cli/run-all.sh
+
+      - name: Record terminal GIFs, WebMs, and screenshots with VHS
+        run: |
+          set -euo pipefail
+          mkdir -p docs/src/assets
+          for tape in docs/tapes/*.tape; do
+            echo "=== Recording $tape ==="
+            docker run --rm -v "$(pwd):/vhs" -w /vhs ghcr.io/charmbracelet/vhs "$tape"
+          done
+          ls -lh docs/src/assets/
+          for name in overview output-formats ranges-and-first protocols-and-bind foreground-reserve; do
+            for ext in gif webm png; do
+              test -s "docs/src/assets/${name}.${ext}"
+            done
+          done
+
+      - name: Install mdBook
+        uses: taiki-e/install-action@mdbook
+
+      - name: Build mdBook site
+        run: mdbook build docs
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/book
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
