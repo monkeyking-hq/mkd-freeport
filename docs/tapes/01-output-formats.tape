@@ -30,7 +30,7 @@ Type "mkd-freeport --human"
 Enter
 Sleep 1s
 
-Type "PORT=$(mkd-freeport --plain) && echo \"Allocated port: $PORT\""
+Type 'PORT=$(mkd-freeport --plain) && echo "Allocated port: $PORT"'
 Enter
 Sleep 1.2s
 
