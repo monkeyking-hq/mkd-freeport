@@ -4,7 +4,9 @@
 
 Discover or reserve TCP/UDP ports over IPv4 and IPv6 for scripts, AI agents, and CI pipelines. Includes a CLI and a public Rust API.
 
-**Version 0.4.0**
+**Version 0.4.1** · [Documentation & Video Demos](https://monkeyking-hq.github.io/mkd-freeport/) · [Executable Examples](examples/)
+
+![mkd-freeport terminal demo](https://monkeyking-hq.github.io/mkd-freeport/assets/overview.gif)
 
 ## Install
 
@@ -179,7 +181,7 @@ Add the published library as a dependency:
 
 ```toml
 [dependencies]
-mkd-freeport = "0.4.0"
+mkd-freeport = "0.4.1"
 ```
 
 ```rust

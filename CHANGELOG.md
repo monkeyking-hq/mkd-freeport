@@ -1,5 +1,12 @@
 ## Unreleased
 
+## [0.4.1] - 2026-11-28
+
+### Added
+- Executable Rust API examples (`examples/basic_discovery.rs`, `examples/custom_range.rs`, `examples/reserve_udp.rs`) and runnable CLI shell scripts (`examples/cli/*.sh`, `examples/cli/run-all.sh`).
+- Declarative Charmbracelet `vhs` terminal recording tapes (`docs/tapes/*.tape`) generating GIF, WebM, and PNG screenshots for every command option group.
+- `mdBook` documentation site (`docs/`) deployed via `.github/workflows/pages.yml` to `https://monkeyking-hq.github.io/mkd-freeport/`, with hero demo and docs link in `README.md`.
+
 ## [0.4.0] - 2026-11-27
 
 ### Added

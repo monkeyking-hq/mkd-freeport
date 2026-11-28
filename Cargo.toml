@@ -7,7 +7,7 @@ members = [".", "xtask"]
 
 [package]
 name = "mkd-freeport"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 rust-version = "1.85"
 description = "Discover and reserve TCP/UDP ports over IPv4 and IPv6 for scripts and AI agents"
@@ -19,6 +19,8 @@ categories = ["command-line-utilities", "network-programming"]
 exclude = [
     "xtask/",
     "packaging/",
+    "docs/",
+    "examples/cli/",
     ".github/",
     ".gitea/",
     ".hashseal.json",
